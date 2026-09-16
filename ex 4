@@ -1,0 +1,57 @@
+clc;
+clear;
+close all;
+
+%% Speed Governing System of a Synchronous Generator
+% Droop Characteristic Analysis
+
+%% 1. Parameters
+R = 0.05;       % 5% Speed Regulation (Droop)
+Tg = 0.2;       % Governor Time Constant (sec)
+
+%% 2. Transfer Function of Governor
+s = tf('s');
+Ggov = 1 / (Tg * s + 1);
+
+%% 3. Step Response of Governor
+figure('Name','Speed Governor Step Response', ...
+       'NumberTitle','off');
+
+step(Ggov);
+
+grid on;
+title('Speed Governor Step Response');
+xlabel('Time (s)');
+ylabel('Governor Output');
+
+%% 4. Speed Deviation Range
+df = -0.05:0.005:0;
+
+%% 5. Load Change Using Droop Relation
+dP = -(1 / R) * df;
+
+%% 6. Plot Droop Characteristic
+figure('Name','Governor Droop Characteristic', ...
+       'NumberTitle','off');
+
+plot(dP, df, 'LineWidth', 2);
+
+grid on;
+xlabel('Load Change (\DeltaP) (pu)');
+ylabel('Frequency Deviation (\Deltaf) (pu)');
+title('Governor Droop Characteristic');
+
+%% 7. Display Table
+disp(' ');
+disp('Frequency Deviation    Load Change');
+disp('-------------------    -----------');
+
+disp([df' dP']);
+
+%% 8. Governor Performance
+info = stepinfo(Ggov);
+
+disp(' ');
+disp('Governor Performance');
+disp('--------------------');
+disp(info);
