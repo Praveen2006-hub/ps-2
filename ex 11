@@ -1,0 +1,39 @@
+% SCADA and RTU Simulation
+
+clc;
+clear;
+close all;
+
+% Input Values
+Voltage_Input = 230;      % Voltage in Volts
+Current_Input = 10;       % Current in Amperes
+
+% Time Duration
+t = 0:1:20;
+
+% RTU Data
+Voltage = Voltage_Input * ones(size(t));
+Current = Current_Input * ones(size(t));
+
+% Voltage Plot
+figure;
+
+subplot(2,1,1);
+plot(t,Voltage,'b','LineWidth',2);
+grid on;
+title('SCADA Voltage Monitoring');
+xlabel('Time (s)');
+ylabel('Voltage (V)');
+
+% Current Plot
+subplot(2,1,2);
+plot(t,Current,'r','LineWidth',2);
+grid on;
+title('SCADA Current Monitoring');
+xlabel('Time (s)');
+ylabel('Current (A)');
+
+% Display Results
+fprintf('Input Voltage = %.0f V\n',Voltage_Input);
+fprintf('Input Current = %.0f A\n',Current_Input);
+fprintf('RTU Data Acquisition Successful\n');
