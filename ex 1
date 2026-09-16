@@ -1,0 +1,58 @@
+clc;
+clear;
+close all;
+
+%% Input Data
+time = 1:24;
+
+load_data = [30 35 32 40 50 65 80 90 85 75 70 65 ...
+             60 65 70 85 100 110 95 80 70 55 45 35];
+
+connected_load = 150;
+
+%% Calculations
+max_demand = max(load_data);
+avg_load = mean(load_data);
+load_factor = avg_load / max_demand;
+demand_factor = max_demand / connected_load;
+
+%% Display Results
+fprintf('\n--- System Load Characteristics ---\n\n');
+fprintf('Maximum Demand : %.2f kW\n', max_demand);
+fprintf('Average Load   : %.2f kW\n', avg_load);
+fprintf('Load Factor    : %.4f (%.2f%%)\n', ...
+        load_factor, load_factor * 100);
+fprintf('Demand Factor  : %.4f (%.2f%%)\n', ...
+        demand_factor, demand_factor * 100);
+
+%% Plot Load Curves
+figure('Name','Load Curves','NumberTitle','off');
+
+%% Daily Load Curve
+subplot(2,1,1);
+stairs([0 time], [load_data(1) load_data], ...
+       'b', 'LineWidth', 2);
+title('Daily Load Curve','FontWeight','bold');
+xlabel('Time (Hours)');
+ylabel('Load (kW)');
+grid on;
+xlim([0 24]);
+ylim([0 max_demand * 1.2]);
+xticks(0:2:24);
+
+%% Load Duration Curve
+subplot(2,1,2);
+sorted_load = sort(load_data, 'descend');
+
+plot(1:24, sorted_load, ...
+     'ro-', ...
+     'LineWidth', 2, ...
+     'MarkerFaceColor', 'r');
+
+title('Load Duration Curve','FontWeight','bold');
+xlabel('Duration (Hours)');
+ylabel('Load (kW)');
+grid on;
+xlim([1 24]);
+ylim([0 max_demand * 1.2]);
+xticks(1:24);
