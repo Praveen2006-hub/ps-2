@@ -1,0 +1,48 @@
+clc;
+clear;
+close all;
+
+% Generator Cost Coefficients
+a = [500 400];       % Fixed Cost
+b = [5.3 5.5];       % Linear Cost Coefficient
+c = [0.004 0.006];   % Quadratic Cost Coefficient
+
+% Total Load Demand
+PD = 250;             % MW
+
+% Lambda Iteration Method
+lambda = 7;
+tolerance = 0.001;
+
+while true
+
+    P1 = (lambda - b(1))/(2*c(1));
+    P2 = (lambda - b(2))/(2*c(2));
+
+    Ptotal = P1 + P2;
+
+    error = PD - Ptotal;
+
+    if abs(error) < tolerance
+        break;
+    end
+
+    lambda = lambda + 0.001*error;
+end
+
+% Total Generation Cost
+Cost = a(1) + b(1)*P1 + c(1)*P1^2 + ...
+       a(2) + b(2)*P2 + c(2)*P2^2;
+
+fprintf('Generator 1 Output = %.2f MW\n',P1);
+fprintf('Generator 2 Output = %.2f MW\n',P2);
+fprintf('Total Generation = %.2f MW\n',P1+P2);
+fprintf('Optimal Cost = %.2f Rs/hr\n',Cost);
+
+% Plot
+figure;
+bar([P1 P2]);
+grid on;
+title('Economic Dispatch of Thermal Units');
+xlabel('Generator');
+ylabel('Power Output (MW)');
