@@ -1,0 +1,114 @@
+clc;
+clear;
+close all;
+
+%% Two-Area Load Frequency Control (LFC)
+
+%% 1. Area-1 Parameters
+R1 = 2.4;
+D1 = 0.8;
+Tg1 = 0.08;
+Tt1 = 0.3;
+Kp1 = 120;
+Tp1 = 20;
+
+%% 2. Area-2 Parameters
+R2 = 2.4;
+D2 = 0.8;
+Tg2 = 0.08;
+Tt2 = 0.3;
+Kp2 = 120;
+Tp2 = 20;
+
+%% 3. Tie-Line Synchronizing Coefficient
+T12 = 0.545;
+
+%% 4. Transfer Function Variable
+s = tf('s');
+
+%% 5. Governor Models
+Gg1 = 1 / (Tg1 * s + 1);
+Gg2 = 1 / (Tg2 * s + 1);
+
+%% 6. Turbine Models
+Gt1 = 1 / (Tt1 * s + 1);
+Gt2 = 1 / (Tt2 * s + 1);
+
+%% 7. Generator-Load Models
+Gp1 = Kp1 / (Tp1 * s + 1);
+Gp2 = Kp2 / (Tp2 * s + 1);
+
+%% 8. Area Transfer Functions
+G1 = Gg1 * Gt1 * Gp1;
+G2 = Gg2 * Gt2 * Gp2;
+
+%% 9. Closed Loop Systems
+Sys1 = feedback(G1, 1 / R1);
+Sys2 = feedback(G2, 1 / R2);
+
+%% 10. Time Vector
+t = 0:0.01:100;
+
+%% 11. Load Disturbance in Area-1
+PL = 0.01;    % pu
+
+%% 12. Frequency Responses
+[df1, t1] = step(-PL * Sys1, t);
+[df2, t2] = step(-0.5 * PL * Sys2, t);
+
+%% 13. Tie-Line Power Deviation
+dPtie = T12 * (df1 - df2);
+
+%% 14. Plot Frequency Deviations
+figure('Name','Two-Area LFC Frequency Response', ...
+       'NumberTitle','off');
+
+plot(t1, df1, 'b', 'LineWidth', 2);
+hold on;
+plot(t2, df2, 'r', 'LineWidth', 2);
+
+grid on;
+xlabel('Time (s)');
+ylabel('Frequency Deviation (Hz)');
+title('Two-Area LFC Frequency Response');
+
+legend('\Delta f_1', '\Delta f_2', ...
+       'Location', 'best');
+
+hold off;
+
+%% 15. Plot Tie-Line Power Deviation
+figure('Name','Tie-Line Power Deviation', ...
+       'NumberTitle','off');
+
+plot(t, dPtie, 'k', 'LineWidth', 2);
+
+grid on;
+xlabel('Time (s)');
+ylabel('\Delta P_{tie} (pu)');
+title('Tie-Line Power Deviation');
+
+%% 16. Performance Information
+disp(' ');
+disp('======================================');
+disp(' TWO-AREA LFC PERFORMANCE');
+disp('======================================');
+
+disp(' ');
+disp('Area-1 Response');
+info1 = stepinfo(-PL * Sys1);
+disp(info1);
+
+disp(' ');
+disp('Area-2 Response');
+info2 = stepinfo(-0.5 * PL * Sys2);
+disp(info2);
+
+%% 17. Steady-State Values
+ss_df1 = dcgain(-PL * Sys1);
+ss_df2 = dcgain(-0.5 * PL * Sys2);
+ss_ptie = T12 * (ss_df1 - ss_df2);
+
+fprintf('\nSteady-State Frequency Deviation - Area 1 = %.6f Hz\n', ss_df1);
+fprintf('Steady-State Frequency Deviation - Area 2 = %.6f Hz\n', ss_df2);
+fprintf('Steady-State Tie-Line Power Deviation = %.6f pu\n', ss_ptie);
