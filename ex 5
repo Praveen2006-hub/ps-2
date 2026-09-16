@@ -1,0 +1,66 @@
+clc;
+clear;
+close all;
+
+%% Automatic Generation Control (AGC)
+% Single Area Power System
+
+%% 1. System Parameters
+R = 2.4;       % Speed Regulation (Hz/pu MW)
+D = 0.8;       % Load Damping Coefficient
+H = 5;         % Inertia Constant (s)
+f0 = 50;       % Rated Frequency (Hz)
+
+%% 2. Governor Parameters
+Tg = 0.08;     % Governor Time Constant (s)
+
+%% 3. Turbine Parameters
+Tt = 0.3;      % Turbine Time Constant (s)
+
+%% 4. Generator-Load Parameters
+Tp = (2 * H) / (D * f0);
+Kp = 1 / D;
+
+%% 5. Transfer Function Variable
+s = tf('s');
+
+%% 6. Governor Transfer Function
+Gg = 1 / (Tg * s + 1);
+
+%% 7. Turbine Transfer Function
+Gt = 1 / (Tt * s + 1);
+
+%% 8. Generator-Load Transfer Function
+Gp = Kp / (Tp * s + 1);
+
+%% 9. Open Loop Transfer Function
+G = Gg * Gt * Gp;
+
+%% 10. AGC Closed Loop System
+Sys = feedback(G, 1 / R);
+
+%% 11. Step Load Disturbance
+t = 0:0.01:50;
+PL = 0.02;     % Step load disturbance (pu)
+
+%% 12. Frequency Response
+[y, t] = step(-PL * Sys, t);
+
+%% 13. Plot Frequency Response
+figure('Name','Single Area AGC Frequency Response', ...
+       'NumberTitle','off');
+
+plot(t, y, 'LineWidth', 2);
+
+grid on;
+xlabel('Time (s)');
+ylabel('Frequency Deviation (Hz)');
+title('Single Area AGC Frequency Response');
+
+%% 14. Performance Parameters
+info = stepinfo(-PL * Sys);
+
+disp(' ');
+disp('Performance Characteristics');
+disp('---------------------------');
+disp(info);
