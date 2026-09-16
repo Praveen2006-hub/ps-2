@@ -1,0 +1,52 @@
+clc;
+clear;
+close all;
+
+%% Measured Data
+z = [1.02; 0.98; 1.01; 1.50];
+
+%% Measurement Matrix
+H = [1 0;
+     0 1;
+     1 1;
+     1 0];
+
+%% Weight Matrix
+W = diag([100 100 100 100]);
+
+%% WLS State Estimation
+x = inv(H' * W * H) * (H' * W * z);
+
+%% Estimated Measurements
+z_est = H * x;
+
+%% Residuals
+r = z - z_est;
+
+%% Bad Data Threshold
+threshold = 0.1;
+
+%% Bad Data Detection
+bad_data = abs(r) > threshold;
+
+%% Display Results
+disp('Estimated States:');
+disp(x);
+
+disp('Residuals:');
+disp(r);
+
+disp('Bad Data Detection:');
+disp(bad_data);
+
+%% Plot
+figure;
+bar(abs(r));
+grid on;
+title('Residual Error for Bad Data Detection');
+xlabel('Measurement Number');
+ylabel('Residual Magnitude');
+
+hold on;
+yline(threshold,'r--','Threshold');
+legend('Residual','Threshold');
