@@ -1,0 +1,42 @@
+clc;
+clear;
+close all;
+
+% Measured Values
+z = [1.02; 0.98; 1.01];
+
+% Measurement Matrix
+H = [1 0;
+     0 1;
+     1 1];
+
+% Weight Matrix
+W = diag([100 100 50]);
+
+% WLS State Estimation
+x = inv(H'*W*H)*(H'*W*z);
+
+% Estimated Measurements
+z_est = H*x;
+
+% Residual Error
+r = z - z_est;
+
+% Display Results
+disp('Estimated State Variables:');
+disp(x);
+
+disp('Estimated Measurements:');
+disp(z_est);
+
+disp('Residual Errors:');
+disp(r);
+
+% Plot WLS State Estimation
+figure;
+bar([z z_est]);
+grid on;
+xlabel('Measurement Number');
+ylabel('Value');
+title('WLS State Estimation');
+legend('Measured','Estimated');
