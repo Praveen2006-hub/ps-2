@@ -1,0 +1,75 @@
+clc;
+clear;
+close all;
+
+%% 1. Input Historical Data
+
+years = [2018 2019 2020 2021 2022 2023 2024];
+
+historical_load = [120 128 135 145 150 162 170];
+
+future_years = [2025 2026 2027 2028 2030];
+
+%% 2. Linear Regression Calculation
+
+coefficients = polyfit(years, historical_load, 1);
+
+m = coefficients(1);
+c = coefficients(2);
+
+%% 3. Predict Future Demand
+
+trend_load = polyval(coefficients, years);
+
+predicted_load = polyval(coefficients, future_years);
+
+%% 4. Display Results
+
+fprintf('\n--- Linear Regression Load Forecasting ---\n\n');
+
+fprintf('Linear Equation:\n');
+fprintf('Load = (%.4f * Year) + (%.4f)\n\n', m, c);
+
+fprintf('Predicted Future Loads:\n');
+
+for i = 1:length(future_years)
+    fprintf('Year %d: %.2f MW\n', ...
+            future_years(i), predicted_load(i));
+end
+
+fprintf('---------------------------------------\n');
+
+%% 5. Plot Results
+
+figure('Name','Load Forecasting', ...
+       'NumberTitle','off');
+
+plot(years, historical_load, ...
+     'bo', ...
+     'MarkerSize', 8, ...
+     'MarkerFaceColor', 'b', ...
+     'DisplayName', 'Historical Load');
+
+hold on;
+
+plot(years, trend_load, ...
+     'k--', ...
+     'LineWidth', 1.5, ...
+     'DisplayName', 'Regression Line');
+
+plot(future_years, predicted_load, ...
+     'rs', ...
+     'MarkerSize', 8, ...
+     'MarkerFaceColor', 'r', ...
+     'DisplayName', 'Predicted Load');
+
+grid on;
+
+xlabel('Year');
+ylabel('Peak Load Demand (MW)');
+
+title('Linear Regression Load Forecasting');
+
+legend('Location','best');
+
+hold off;
