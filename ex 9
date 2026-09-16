@@ -1,0 +1,35 @@
+clc;
+clear;
+close all;
+
+% Simulation Time
+t = 0:0.1:10;
+
+% Voltage Response without Compensation
+V_without = 0.85 + 0.05*(1-exp(-0.2*t));
+
+% Voltage Response with SVC
+V_svc = 0.85 + 0.12*(1-exp(-0.5*t));
+
+% Voltage Response with STATCOM
+V_statcom = 0.85 + 0.15*(1-exp(-1.0*t));
+
+% Plot Voltage Profiles
+figure;
+plot(t,V_without,'r','LineWidth',2);
+hold on;
+plot(t,V_svc,'b','LineWidth',2);
+plot(t,V_statcom,'g','LineWidth',2);
+
+grid on;
+xlabel('Time (s)');
+ylabel('Voltage (pu)');
+title('Performance Comparison of FACTS Devices');
+legend('Without Compensation','SVC','STATCOM');
+
+% Reactive Power Support
+Q_svc = 80;        % MVAR
+Q_statcom = 100;   % MVAR
+
+fprintf('Reactive Power by SVC = %d MVAR\n',Q_svc);
+fprintf('Reactive Power by STATCOM = %d MVAR\n',Q_statcom);
