@@ -1,0 +1,31 @@
+clc;
+clear;
+close all;
+
+% Given Values
+P = 100;        % Real Power (kW)
+PF1 = 0.7;      % Initial Power Factor
+PF2 = 0.95;     % Improved Power Factor
+V = 400;        % Supply Voltage (V)
+
+% Current Before PF Improvement
+I1 = (P*1000)/(sqrt(3)*V*PF1);
+
+% Current After PF Improvement
+I2 = (P*1000)/(sqrt(3)*V*PF2);
+
+% Voltage Regulation Improvement
+VR1 = ((I1-I2)/I1)*100;
+
+% Display Results
+fprintf('Current before PF Improvement = %.2f A\n',I1);
+fprintf('Current after PF Improvement = %.2f A\n',I2);
+fprintf('Percentage Voltage Regulation Improvement = %.2f %%\n',VR1);
+
+% Plot
+figure;
+bar([I1 I2]);
+grid on;
+title('Power Factor Improvement');
+ylabel('Current (A)');
+xlabel('Condition');
