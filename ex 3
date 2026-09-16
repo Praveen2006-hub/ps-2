@@ -1,0 +1,88 @@
+clc;
+clear;
+close all;
+
+%% Single Area Load Frequency Control (LFC)
+% Frequency Response for Step Load Disturbances
+
+%% 1. System Parameters
+R = 2.4;       % Speed Regulation (Hz/pu MW)
+D = 0.8;       % Load Damping Coefficient
+H = 5;         % Inertia Constant (s)
+f0 = 50;       % Nominal Frequency (Hz)
+
+%% 2. Generator-Load Parameters
+Tp = (2 * H) / (D * f0);
+Kp = 1 / D;
+
+%% 3. Transfer Function of Generator-Load Model
+s = tf('s');
+Gp = Kp / (Tp * s + 1);
+
+%% 4. Governor Transfer Function
+Tg = 0.08;
+Gg = 1 / (Tg * s + 1);
+
+%% 5. Turbine Transfer Function
+Tt = 0.3;
+Gt = 1 / (Tt * s + 1);
+
+%% 6. Open Loop Transfer Function
+G = Gg * Gt * Gp;
+
+%% 7. Closed Loop Transfer Function
+Sys = feedback(G, 1 / R);
+
+%% 8. Simulation Time
+t = 0:0.01:50;
+
+%% 9. Different Step Load Disturbances
+PL1 = 0.01;    % pu MW
+PL2 = 0.02;    % pu MW
+PL3 = 0.05;    % pu MW
+
+%% 10. Frequency Responses
+[y1, t1] = step(-PL1 * Sys, t);
+[y2, t2] = step(-PL2 * Sys, t);
+[y3, t3] = step(-PL3 * Sys, t);
+
+%% 11. Plot Results
+figure('Name', 'Single Area LFC Response', ...
+       'NumberTitle', 'off');
+
+plot(t1, y1, 'LineWidth', 2);
+hold on;
+
+plot(t2, y2, 'LineWidth', 2);
+plot(t3, y3, 'LineWidth', 2);
+
+grid on;
+
+xlabel('Time (s)');
+ylabel('Frequency Deviation (Hz)');
+title('Single Area LFC Response for Different Load Disturbances');
+
+legend('\DeltaP_L = 0.01 pu', ...
+       '\DeltaP_L = 0.02 pu', ...
+       '\DeltaP_L = 0.05 pu', ...
+       'Location', 'best');
+
+hold off;
+
+%% 12. Performance Analysis
+info1 = stepinfo(-PL1 * Sys);
+info2 = stepinfo(-PL2 * Sys);
+info3 = stepinfo(-PL3 * Sys);
+
+disp(' ');
+disp('Performance Characteristics');
+disp('============================');
+
+disp('For PL = 0.01 pu:');
+disp(info1);
+
+disp('For PL = 0.02 pu:');
+disp(info2);
+
+disp('For PL = 0.05 pu:');
+disp(info3);
