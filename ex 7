@@ -1,0 +1,78 @@
+clc;
+clear;
+close all;
+
+%% Automatic Voltage Regulator (AVR) System Simulation
+
+%% 1. Component Parameters
+Ka = 10;
+Ta = 0.1;
+
+Ke = 1.0;
+Te = 0.4;
+
+Kg = 1.0;
+Tg = 1.0;
+
+Ks = 1.0;
+Ts = 0.05;
+
+%% 2. Laplace Variable
+s = tf('s');
+
+%% 3. Transfer Functions
+G_amp = Ka / (1 + Ta * s);
+G_exc = Ke / (1 + Te * s);
+G_gen = Kg / (1 + Tg * s);
+G_sen = Ks / (1 + Ts * s);
+
+%% 4. Forward Path
+G_forward = G_amp * G_exc * G_gen;
+
+%% 5. Closed-Loop AVR Transfer Function
+T_avr = feedback(G_forward, G_sen);
+
+%% 6. Display Transfer Function
+disp('Closed-loop AVR Transfer Function:');
+T_avr
+
+%% 7. Step Response
+t = 0:0.01:10;
+[y, t] = step(T_avr, t);
+
+%% 8. Plot Response
+figure('Name','AVR Step Response', ...
+       'NumberTitle','off');
+
+plot(t, y, 'b', 'LineWidth', 2);
+hold on;
+
+plot(t, ones(size(t)), 'r--', 'LineWidth', 1.5);
+
+grid on;
+xlabel('Time (sec)');
+ylabel('Terminal Voltage V_t (pu)');
+title('Step Response of Automatic Voltage Regulator (AVR) System');
+
+legend('V_t Response', ...
+       'Reference V_{ref}', ...
+       'Location','best');
+
+hold off;
+
+%% 9. Steady-State Value
+fprintf('Steady-state terminal voltage = %.4f pu\n', y(end));
+
+%% 10. Performance Parameters
+info = stepinfo(T_avr);
+
+disp(' ');
+disp('AVR Performance Characteristics');
+disp('-------------------------------');
+disp(info);
+
+%% 11. Steady-State Error
+steady_state_error = abs(1 - y(end));
+
+fprintf('Steady-state error = %.4f pu\n', ...
+        steady_state_error);
