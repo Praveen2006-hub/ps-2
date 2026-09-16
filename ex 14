@@ -1,0 +1,58 @@
+clc;
+clear;
+close all;
+
+% Number of Units
+n = 3;
+
+% Operating Cost (Rs/hr)
+cost = [500 700 900];
+
+% Power Generation Capacity (MW)
+P = [100 150 200];
+
+% Load Demand (MW)
+PD = 250;
+
+% Initialize
+min_cost = inf;
+best_combination = [];
+
+% Forward Dynamic Programming
+for u1 = 0:1
+    for u2 = 0:1
+        for u3 = 0:1
+
+            units = [u1 u2 u3];
+
+            total_power = sum(units .* P);
+            total_cost = sum(units .* cost);
+
+            if total_power >= PD
+                if total_cost < min_cost
+                    min_cost = total_cost;
+                    best_combination = units;
+                end
+            end
+
+        end
+    end
+end
+
+% Display Results
+disp('Optimal Unit Commitment:');
+disp(best_combination);
+
+fprintf('Total Available Power = %.0f MW\n', ...
+    sum(best_combination .* P));
+
+fprintf('Minimum Operating Cost = %.2f Rs/hr\n', ...
+    min_cost);
+
+% Plot
+figure;
+bar(best_combination);
+grid on;
+title('Optimal Unit Commitment');
+xlabel('Generating Units');
+ylabel('Status (1=ON, 0=OFF)');
